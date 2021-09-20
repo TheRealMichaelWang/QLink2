@@ -12,6 +12,7 @@ namespace Client.networking
 {
     public sealed class Client : IDisposable
     {
+        // Variables
         private readonly TcpClient client;
         private readonly IPEndPoint ipEndPoint;
 
@@ -21,6 +22,7 @@ namespace Client.networking
 
         private bool disposed;
 
+        // Setup client config
         public Client(IPAddress serverAddress, int serverPort)
         {
             this.ipEndPoint = new IPEndPoint(serverAddress, serverPort);
@@ -31,6 +33,7 @@ namespace Client.networking
             this.disposed = false;
         }
 
+        // Handle with incomming packets
         public InboundPacket MakeRequest(OutboundPacket request)
         {
             request.Send(this.networkStream);
@@ -38,6 +41,7 @@ namespace Client.networking
             return response;
         }
 
+        //Stops processes
         public void Dispose()
         {
             if (this.disposed)

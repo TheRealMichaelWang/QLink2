@@ -11,6 +11,7 @@ namespace Server.networking
 
     public class Session : IDisposable
     {
+        // Variables
         protected delegate void OpcodeHandler(InboundPacket inboundPacket, NetworkStream networkStream);
 
         protected readonly TcpClient client;
@@ -25,6 +26,7 @@ namespace Server.networking
 
         public SessionDisposedHandler SessionDisposed;
 
+        // Set config for default session
         public Session(TcpClient client, SessionDisposedHandler sessionDisposedHandler)
         {
             this.client = client;
@@ -36,6 +38,7 @@ namespace Server.networking
             this.Disposed = false;
         }
 
+        // Listens for new packets
         private void listenLoop()
         {
             while (!this.stopping)
@@ -55,6 +58,7 @@ namespace Server.networking
             }
         }
 
+        // Gets rid of the current session
         public void Dispose() => Dispose(true);
 
         private void Dispose(bool disposing)

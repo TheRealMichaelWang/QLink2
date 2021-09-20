@@ -10,6 +10,7 @@ namespace Server.networking
 
     public sealed class Server
     {
+        // Variables
         private readonly TcpListener tcpListener;
         private readonly List<Session> sessions;
         private readonly Thread connectionThread;
@@ -28,6 +29,7 @@ namespace Server.networking
             this.Running = false;
         }
 
+        // Start the server
         public void Start()
         {
             if (this.Running)
@@ -38,6 +40,7 @@ namespace Server.networking
             this.Running = true;
         }
 
+        // Stop the server
         public void Stop()
         {
             stopping = true;
@@ -46,11 +49,13 @@ namespace Server.networking
             this.Running = false;
         }
 
+        // Get rid of a session
         private void handleSessionDisposed(Session session)
         {
             sessions.Remove(session);
         }
 
+        // connect clients to the session
         private void connectionLoop()
         {
             while (!stopping)
