@@ -5,7 +5,7 @@ using System.Text;
 namespace QuantumLink.networking.protocol
 {
     // Default packet
-    public class Packet
+    public abstract class Packet
     {
         public readonly byte Opcode;
         protected readonly Stream stream;
@@ -47,6 +47,11 @@ namespace QuantumLink.networking.protocol
         public InboundPacket(NetworkStream networkStream) : base((byte)networkStream.ReadByte(), networkStream)
         {
             reader = new BinaryReader(networkStream, Encoding.UTF8);
+        }
+
+        public InboundPacket(InboundPacket thisPacket) : base(thisPacket.Opcode, thisPacket.stream)
+        {
+            reader = thisPacket.reader;
         }
     }
 }

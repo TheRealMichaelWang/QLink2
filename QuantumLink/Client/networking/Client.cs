@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Client.networking
 {
-    public sealed class Client : IDisposable
+    public sealed partial class Client : IDisposable
     {
         // Variables
         private readonly TcpClient client;
