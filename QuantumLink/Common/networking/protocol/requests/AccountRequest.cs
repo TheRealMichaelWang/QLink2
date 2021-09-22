@@ -1,9 +1,4 @@
 ﻿using QuantumLink.networking.protocol;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Common.networking.protocol.requests
 {
@@ -14,6 +9,7 @@ namespace Common.networking.protocol.requests
             public AccountRequestEncoder(AccountRequest accountRequest) : base(1)
             {
                 this.writer.Write((byte)accountRequest.Operation);
+                this.writer.Write(accountRequest.Password);
             }
         }
 
@@ -23,22 +19,24 @@ namespace Common.networking.protocol.requests
 
             public AccountRequestDecoder(InboundPacket inboundPacket) : base(inboundPacket)
             {
-                DecodedAccountRequest = new AccountRequest((AccountOperation)this.reader.ReadByte());
+                DecodedAccountRequest = new AccountRequest((AccountOperation)this.reader.ReadByte(), this.reader.ReadString());
             }
         }
 
         public enum AccountOperation
         {
             Logout,
-            QueryInfo,
+            ChangeUsername,
             DeleteAccount
         }
 
         public readonly AccountOperation Operation;
+        public readonly string Password;
 
-        public AccountRequest(AccountOperation operation)
+        public AccountRequest(AccountOperation operation, string password)
         {
             this.Operation = operation;
+            this.Password = password;
         }
     }
 }

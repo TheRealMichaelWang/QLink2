@@ -6,12 +6,12 @@ using System.Net.Sockets;
 using System.Threading;
 
 namespace Server.networking
-{    
-    public delegate void SessionDisposedHandler(Session session);
+{
+    public delegate void ClientDisconnectedEventHandler(Session session);
 
     public class Session : IDisposable
     {
-        protected delegate void OpcodeHandler(InboundPacket inboundPacket, NetworkStream networkStream);
+        protected delegate void OpcodeHandler(InboundPacket inboundPacket);
 
         protected readonly TcpClient client;
         protected readonly NetworkStream networkStream;
@@ -21,15 +21,18 @@ namespace Server.networking
         
         public bool Disposed { get; private set; }
 
-        private readonly Dictionary<byte, OpcodeHandler> handlers;
+        protected readonly Dictionary<byte, OpcodeHandler> handlers;
+        protected readonly Queue<OutboundPacket> toSend;
 
-        public SessionDisposedHandler SessionDisposed;
+        public ClientDisconnectedEventHandler ClientDisconnected;
 
-        public Session(TcpClient client, SessionDisposedHandler sessionDisposedHandler)
+        public Session(TcpClient client, ClientDisconnectedEventHandler clientDisconnectedHandler)
         {
             this.client = client;
-            this.SessionDisposed = sessionDisposedHandler;
+            this.ClientDisconnected = clientDisconnectedHandler;
             this.networkStream = client.GetStream();
+            this.handlers = new Dictionary<byte, OpcodeHandler>();
+            this.toSend = new Queue<OutboundPacket>();
             this.listenThread = new Thread(new ThreadStart(listenLoop));
             this.listenThread.Start();
             this.stopping = false;
@@ -45,7 +48,18 @@ namespace Server.networking
                     try
                     {
                         InboundPacket inboundPacket = new InboundPacket(networkStream);
-                        handlers[inboundPacket.Opcode](inboundPacket, networkStream);
+                        handlers[inboundPacket.Opcode](inboundPacket);
+                    }
+                    catch (IOException)
+                    {
+                        Dispose();
+                    }
+                }
+                while(!this.stopping && toSend.Count > 0)
+                {
+                    try
+                    {
+                        toSend.Dequeue().Send(networkStream);
                     }
                     catch (IOException)
                     {
@@ -67,7 +81,7 @@ namespace Server.networking
                 this.stopping = true;
                 this.networkStream.Close();
                 this.client.Close();
-                this.SessionDisposed(this);
+                this.ClientDisconnected(this);
             }
             this.Disposed = true;
         }

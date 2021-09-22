@@ -10,6 +10,7 @@ namespace Common.networking.protocol.requests
             {
                 this.writer.Write(request.Username);
                 this.writer.Write(request.Password);
+                this.writer.Write(request.CreateAccount);
             }
         }
 
@@ -19,17 +20,20 @@ namespace Common.networking.protocol.requests
 
             public AuthRequestDecoder(InboundPacket inboundPacket) : base(inboundPacket)
             {
-                this.DecodedAuthRequest = new AuthRequest(this.reader.ReadString(), this.reader.ReadString());
+                this.DecodedAuthRequest = new AuthRequest(this.reader.ReadString(), this.reader.ReadString(), this.reader.ReadBoolean());
             }
         }
 
         public readonly string Username;
         public readonly string Password;
 
-        public AuthRequest(string username, string password)
+        public readonly bool CreateAccount;
+
+        public AuthRequest(string username, string password, bool createAccount)
         {
             this.Username = username;
             this.Password = password;
+            this.CreateAccount = createAccount;
         }
     }
 }
