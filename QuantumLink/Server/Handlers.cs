@@ -18,6 +18,7 @@ namespace Server.networking
         public HandledSession(TcpClient client, ClientDisconnectedEventHandler sessionDisposedHandler, Authenticator authenticator) : base(client, sessionDisposedHandler)
         {
             handlers.Add(0, handleAuthRequest);
+            handlers.Add(1, handleAccountRequest);
             this.Authenticator = authenticator;
         }
 
@@ -32,13 +33,30 @@ namespace Server.networking
         {
             AccountRequest.AccountRequestDecoder accountRequestDecoder = new AccountRequest.AccountRequestDecoder(inboundPacket);
             AccountRequest.AccountOperation operation = accountRequestDecoder.DecodedAccountRequest.Operation;
-            if(operation == AccountRequest.AccountOperation.Logout)
+            try
             {
-
+                Account sessionAccount = Authenticator.FindAccount(this);
+                string statusMsg;
+                if (operation == AccountRequest.AccountOperation.Logout)
+                {
+                    Authenticator.Logout(sessionAccount);
+                    statusMsg = "Succesfully logged out";
+                }
+                else if (operation == AccountRequest.AccountOperation.ChangePassword)
+                {
+                    sessionAccount.Password = accountRequestDecoder.DecodedAccountRequest.Payload;
+                    statusMsg = "Succesfully changed password";
+                }
+                else
+                {
+                    Authenticator.DeleteAccount(sessionAccount);
+                    statusMsg = "Account succesfully deleted";
+                }
+                this.toSend.Enqueue(new StatusResponse.StatusResponseEncoder(new StatusResponse(0, statusMsg)));
             }
-            else if(operation == AccountRequest.AccountOperation.DeleteAccount)
+            catch (KeyNotFoundException)
             {
-
+                this.toSend.Enqueue(new StatusResponse.StatusResponseEncoder(new StatusResponse(1, "You're not logged in")));
             }
         }
     }

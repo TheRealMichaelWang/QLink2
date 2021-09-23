@@ -12,10 +12,10 @@ namespace Server.authentication
         }
 
         public readonly string Username;
-        public readonly string Password;
+        public string Password;
 
         public DateTime LastLogon;
-        public DateTime CakeDay;
+        public readonly DateTime CakeDay;
 
         public Account(string username, string passsword, DateTime lastLoggon, DateTime cakeDay)
         {

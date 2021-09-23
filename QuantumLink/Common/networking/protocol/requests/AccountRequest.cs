@@ -9,7 +9,7 @@ namespace Common.networking.protocol.requests
             public AccountRequestEncoder(AccountRequest accountRequest) : base(1)
             {
                 this.writer.Write((byte)accountRequest.Operation);
-                this.writer.Write(accountRequest.Password);
+                this.writer.Write(accountRequest.Payload);
             }
         }
 
@@ -26,17 +26,17 @@ namespace Common.networking.protocol.requests
         public enum AccountOperation
         {
             Logout,
-            ChangeUsername,
+            ChangePassword,
             DeleteAccount
         }
 
         public readonly AccountOperation Operation;
-        public readonly string Password;
+        public readonly string Payload;
 
-        public AccountRequest(AccountOperation operation, string password)
+        public AccountRequest(AccountOperation operation, string payload)
         {
             this.Operation = operation;
-            this.Password = password;
+            this.Payload = payload;
         }
     }
 }

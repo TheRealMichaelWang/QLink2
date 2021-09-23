@@ -9,80 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Server.authentication
-{ 
+{
     public sealed class Authenticator : IDisposable
     {
-        public sealed class AccountDatabase
-        {
-            public static AccountDatabase FromFile(string filePath)
-            {
-                FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                BinaryReader reader = new BinaryReader(fileStream);
-                int accounts = reader.ReadInt32();
-                List<Account> accountList = new List<Account>(accounts);
-                for (int i = 0; i < accounts; i++)
-                    accountList[i] = Account.FromStream(fileStream);
-                AccountDatabase accountDatabase = new AccountDatabase(accountList, filePath);
-                fileStream.Close();
-                return accountDatabase;
-            }
-
-            public Account this[string username]
-            {
-                get
-                {
-                    return usernameLookup[username];
-                }
-                set
-                {
-                    if (!usernameLookup.ContainsKey(username))
-                        throw new InvalidOperationException("No such user \"" + username + "\" exists.");
-                }
-            }
-
-            private string saveFileSource;
-
-            private List<Account> accountList;
-            private Dictionary<string, Account> usernameLookup;
-
-            public bool HasAccount(string username) => usernameLookup.ContainsKey(username);
-
-            private AccountDatabase(List<Account> accountList, string saveFileSource)
-            {
-                this.accountList = accountList;
-                this.saveFileSource = saveFileSource;
-                this.usernameLookup = new Dictionary<string, Account>();
-                foreach(Account account in accountList)
-                {
-                    if (usernameLookup.ContainsKey(account.Username))
-                        throw new InvalidOperationException("Accounts cannot have the same username.");
-                    usernameLookup.Add(account.Username, account);
-                }
-            }
-
-            public Account RegisterAccount(string username, string password)
-            {
-                if (usernameLookup.ContainsKey(username))
-                    throw new InvalidOperationException("Cannot create an account with a username already taken.");
-                Account account = new Account(username, password, DateTime.Now, DateTime.Now);
-                this.accountList.Add(account);
-                this.usernameLookup.Add(username, account);
-                return account;
-            }
-
-            public void Save()
-            {
-                if (saveFileSource == null)
-                    throw new InvalidOperationException("Cannot save a database with no assigned file source.");
-                FileStream fileStream = new FileStream(saveFileSource, FileMode.Open, FileAccess.Write);
-                BinaryWriter writer = new BinaryWriter(fileStream);
-                writer.Write(accountList.Count);
-                foreach (Account account in accountList)
-                    account.WriteToStream(fileStream);
-                fileStream.Close();
-            }
-        }
-
         public readonly AccountDatabase accountDatabase;
 
         private Dictionary<Account, HandledSession> sessionLookups;
@@ -99,13 +28,15 @@ namespace Server.authentication
             server.ClientDisconencted = handleClientDisconnect;
         }
 
+        public Account FindAccount(HandledSession session) => this.accountLookups[session];
+
         private void handleClientDisconnect(Session session)
         {
             if (accountLookups.ContainsKey(session))
-                logoutAccount(accountLookups[session]);
+                Logout(accountLookups[session]);
         }
 
-        private void logoutAccount(Account account)
+        public void Logout(Account account)
         {
             authenticatedAccounts.Remove(account);
             accountLookups.Remove(sessionLookups[account]);
@@ -120,7 +51,6 @@ namespace Server.authentication
                 try
                 {
                     account = accountDatabase.RegisterAccount(authRequest.Username, authRequest.Password);
-
                 }
                 catch (InvalidOperationException)
                 {
@@ -142,6 +72,17 @@ namespace Server.authentication
             sessionLookups.Add(account, session);
             accountLookups.Add(session, account);
             return new StatusResponse(0, "Succesfully logged in");
+        }
+
+        public void DeleteAccount(Account account)
+        {
+            accountDatabase.DeleteAccount(account);
+            if (authenticatedAccounts.Remove(account))
+            {
+                Session session = sessionLookups[account];
+                sessionLookups.Remove(account);
+                accountLookups.Remove(session);
+            }
         }
 
         public void Dispose() => accountDatabase.Save();
