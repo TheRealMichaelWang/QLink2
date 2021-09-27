@@ -24,10 +24,7 @@ namespace Server.authentication
 
         public Account this[string username]
         {
-            get
-            {
-                return _usernameLookup[username];
-            }
+            get =>_usernameLookup[username];
             set
             {
                 if (!_usernameLookup.ContainsKey(username))

@@ -12,7 +12,7 @@ namespace Server.authentication
 {
     public sealed class Authenticator : IDisposable
     {
-        public readonly AccountDatabase AccountDatabase;
+        public AccountDatabase AccountDatabase { get; }
 
         private Dictionary<Account, HandledSession> _sessionLookups;
         private Dictionary<Session, Account> _accountLookups;
@@ -25,7 +25,7 @@ namespace Server.authentication
             this._sessionLookups = new Dictionary<Account, HandledSession>();
             this._accountLookups = new Dictionary<Session, Account>();
             this._authenticatedAccounts = new HashSet<Account>();
-            server.ClientDisconencted = HandleClientDisconnect;
+            server.ClientDisconnencted = HandleClientDisconnect;
         }
 
         public Account FindAccount(HandledSession session) => this._accountLookups[session];

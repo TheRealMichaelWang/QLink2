@@ -18,8 +18,8 @@ namespace Server.networking
 
         public bool Running { get; private set; }
 
-        public ClientConnectedEventHandler ClientConnected;
-        public ClientDisconnectedEventHandler ClientDisconencted;
+        public ClientConnectedEventHandler    ClientConnected     { get; set; }
+        public ClientDisconnectedEventHandler ClientDisconnencted { get; set; }
 
         public Server(int port)
         {
@@ -50,7 +50,7 @@ namespace Server.networking
         private void HandleSessionDisposed(Session session)
         {
             _sessions.Remove(session);
-            ClientDisconencted?.Invoke(session);
+            ClientDisconnencted?.Invoke(session);
         }
 
         private void ConnectionLoop()

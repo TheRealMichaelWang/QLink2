@@ -47,9 +47,12 @@ namespace Server.networking
                         sessionAccount.Password = accountRequestDecoder.DecodedAccountRequest.Payload;
                         statusMsg = "Succesfully changed password";
                         break;
-                    default:
+                    case AccountRequest.AccountOperation.DeleteAccount:
                         _authenticator.DeleteAccount(sessionAccount);
                         statusMsg = "Account succesfully deleted";
+                        break;
+                    default:
+                        statusMsg = "No Action!";
                         break;
                 }
                 this.ToSend.Enqueue(new StatusResponse.StatusResponseEncoder(new StatusResponse(0, statusMsg)));
