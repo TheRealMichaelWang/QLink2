@@ -10,11 +10,11 @@ namespace Server.networking
 
     public sealed class Server
     {
-        private readonly TcpListener tcpListener;
-        private readonly List<Session> sessions;
-        private readonly Thread connectionThread;
+        private readonly TcpListener _tcpListener;
+        private readonly List<Session> _sessions;
+        private readonly Thread _connectionThread;
 
-        private volatile bool stopping;
+        private volatile bool _stopping;
 
         public bool Running { get; private set; }
 
@@ -23,9 +23,9 @@ namespace Server.networking
 
         public Server(int port)
         {
-            sessions = new List<Session>();
-            tcpListener = new TcpListener(IPAddress.Any, port);
-            connectionThread = new Thread(ConnectionLoop);
+            _sessions = new List<Session>();
+            _tcpListener = new TcpListener(IPAddress.Any, port);
+            _connectionThread = new Thread(ConnectionLoop);
             this.Running = false;
         }
 
@@ -33,35 +33,35 @@ namespace Server.networking
         {
             if (this.Running)
                 throw new InvalidOperationException();
-            this.stopping = false;
-            tcpListener.Start();
-            connectionThread.Start();
+            this._stopping = false;
+            _tcpListener.Start();
+            _connectionThread.Start();
             this.Running = true;
         }
 
         public void Stop()
         {
-            stopping = true;
-            while (connectionThread.IsAlive) { }
-            tcpListener.Stop();
+            _stopping = true;
+            while (_connectionThread.IsAlive) { }
+            _tcpListener.Stop();
             this.Running = false;
         }
 
         private void HandleSessionDisposed(Session session)
         {
-            sessions.Remove(session);
+            _sessions.Remove(session);
             ClientDisconencted?.Invoke(session);
         }
 
         private void ConnectionLoop()
         {
-            while (!stopping)
+            while (!_stopping)
             {
-                if (tcpListener.Pending())
+                if (_tcpListener.Pending())
                 {
-                    TcpClient client = tcpListener.AcceptTcpClient();
+                    TcpClient client = _tcpListener.AcceptTcpClient();
                     Session toadd = ClientConnected != null ? ClientConnected(client) : new Session(client, HandleSessionDisposed);
-                    sessions.Add(toadd);
+                    _sessions.Add(toadd);
                 }
             }
         }

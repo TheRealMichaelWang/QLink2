@@ -12,35 +12,35 @@ namespace Server.authentication
 {
     public sealed class Authenticator : IDisposable
     {
-        public readonly AccountDatabase accountDatabase;
+        public readonly AccountDatabase AccountDatabase;
 
-        private Dictionary<Account, HandledSession> sessionLookups;
-        private Dictionary<Session, Account> accountLookups;
+        private Dictionary<Account, HandledSession> _sessionLookups;
+        private Dictionary<Session, Account> _accountLookups;
 
-        private HashSet<Account> authenticatedAccounts;
+        private HashSet<Account> _authenticatedAccounts;
 
         public Authenticator(AccountDatabase accountDatabase, Server.networking.Server server)
         {
-            this.accountDatabase = accountDatabase;
-            this.sessionLookups = new Dictionary<Account, HandledSession>();
-            this.accountLookups = new Dictionary<Session, Account>();
-            this.authenticatedAccounts = new HashSet<Account>();
-            server.ClientDisconencted = handleClientDisconnect;
+            this.AccountDatabase = accountDatabase;
+            this._sessionLookups = new Dictionary<Account, HandledSession>();
+            this._accountLookups = new Dictionary<Session, Account>();
+            this._authenticatedAccounts = new HashSet<Account>();
+            server.ClientDisconencted = HandleClientDisconnect;
         }
 
-        public Account FindAccount(HandledSession session) => this.accountLookups[session];
+        public Account FindAccount(HandledSession session) => this._accountLookups[session];
 
-        private void handleClientDisconnect(Session session)
+        private void HandleClientDisconnect(Session session)
         {
-            if (accountLookups.ContainsKey(session))
-                Logout(accountLookups[session]);
+            if (_accountLookups.ContainsKey(session))
+                Logout(_accountLookups[session]);
         }
 
         public void Logout(Account account)
         {
-            authenticatedAccounts.Remove(account);
-            accountLookups.Remove(sessionLookups[account]);
-            sessionLookups.Remove(account);
+            _authenticatedAccounts.Remove(account);
+            _accountLookups.Remove(_sessionLookups[account]);
+            _sessionLookups.Remove(account);
         }
 
         public StatusResponse Authenticate(AuthRequest authRequest, HandledSession session)
@@ -50,7 +50,7 @@ namespace Server.authentication
             {
                 try
                 {
-                    account = accountDatabase.RegisterAccount(authRequest.Username, authRequest.Password);
+                    account = AccountDatabase.RegisterAccount(authRequest.Username, authRequest.Password);
                 }
                 catch (InvalidOperationException)
                 {
@@ -59,32 +59,32 @@ namespace Server.authentication
             }
             else
             {
-                if (!accountDatabase.HasAccount(authRequest.Username))
+                if (!AccountDatabase.HasAccount(authRequest.Username))
                     return new StatusResponse(1, "Unkown or Invalid Username");
-                account = accountDatabase[authRequest.Username];
+                account = AccountDatabase[authRequest.Username];
                 if (account.Password != authRequest.Password)
                     return new StatusResponse(2, "Incorrect Password");
-                if (sessionLookups.ContainsKey(account))
+                if (_sessionLookups.ContainsKey(account))
                     return new StatusResponse(3, "Account already in session");
                 account.LastLogon = DateTime.Now;
             }
-            authenticatedAccounts.Add(account);
-            sessionLookups.Add(account, session);
-            accountLookups.Add(session, account);
+            _authenticatedAccounts.Add(account);
+            _sessionLookups.Add(account, session);
+            _accountLookups.Add(session, account);
             return new StatusResponse(0, "Succesfully logged in");
         }
 
         public void DeleteAccount(Account account)
         {
-            accountDatabase.DeleteAccount(account);
-            if (authenticatedAccounts.Remove(account))
+            AccountDatabase.DeleteAccount(account);
+            if (_authenticatedAccounts.Remove(account))
             {
-                Session session = sessionLookups[account];
-                sessionLookups.Remove(account);
-                accountLookups.Remove(session);
+                Session session = _sessionLookups[account];
+                _sessionLookups.Remove(account);
+                _accountLookups.Remove(session);
             }
         }
 
-        public void Dispose() => accountDatabase.Save();
+        public void Dispose() => AccountDatabase.Save();
     }
 }

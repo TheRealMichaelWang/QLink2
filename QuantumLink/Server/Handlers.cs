@@ -17,8 +17,8 @@ namespace Server.networking
 
         public HandledSession(TcpClient client, ClientDisconnectedEventHandler sessionDisposedHandler, Authenticator authenticator) : base(client, sessionDisposedHandler)
         {
-            handlers.Add(0, HandleAuthRequest);
-            handlers.Add(1, HandleAccountRequest);
+            Handlers.Add(0, HandleAuthRequest);
+            Handlers.Add(1, HandleAccountRequest);
             this._authenticator = authenticator;
         }
 
@@ -26,7 +26,7 @@ namespace Server.networking
         {
             AuthRequest.AuthRequestDecoder authRequestDecoder = new AuthRequest.AuthRequestDecoder(inboundPacket);
             StatusResponse response = _authenticator.Authenticate(authRequestDecoder.DecodedAuthRequest, this);
-            this.toSend.Enqueue(new StatusResponse.StatusResponseEncoder(response));
+            this.ToSend.Enqueue(new StatusResponse.StatusResponseEncoder(response));
         }
 
         private void HandleAccountRequest(InboundPacket inboundPacket)
@@ -52,11 +52,11 @@ namespace Server.networking
                         statusMsg = "Account succesfully deleted";
                         break;
                 }
-                this.toSend.Enqueue(new StatusResponse.StatusResponseEncoder(new StatusResponse(0, statusMsg)));
+                this.ToSend.Enqueue(new StatusResponse.StatusResponseEncoder(new StatusResponse(0, statusMsg)));
             }
             catch (KeyNotFoundException)
             {
-                this.toSend.Enqueue(new StatusResponse.StatusResponseEncoder(new StatusResponse(1, "You're not logged in")));
+                this.ToSend.Enqueue(new StatusResponse.StatusResponseEncoder(new StatusResponse(1, "You're not logged in")));
             }
         }
     }

@@ -26,61 +26,61 @@ namespace Server.authentication
         {
             get
             {
-                return usernameLookup[username];
+                return _usernameLookup[username];
             }
             set
             {
-                if (!usernameLookup.ContainsKey(username))
+                if (!_usernameLookup.ContainsKey(username))
                     throw new InvalidOperationException("No such user \"" + username + "\" exists.");
             }
         }
 
-        private string saveFileSource;
+        private string _saveFileSource;
 
-        private List<Account> accountList;
-        private Dictionary<string, Account> usernameLookup;
+        private List<Account> _accountList;
+        private Dictionary<string, Account> _usernameLookup;
 
-        public bool HasAccount(string username) => usernameLookup.ContainsKey(username);
+        public bool HasAccount(string username) => _usernameLookup.ContainsKey(username);
 
         private AccountDatabase(List<Account> accountList, string saveFileSource)
         {
-            this.accountList = accountList;
-            this.saveFileSource = saveFileSource;
-            this.usernameLookup = new Dictionary<string, Account>();
+            this._accountList = accountList;
+            this._saveFileSource = saveFileSource;
+            this._usernameLookup = new Dictionary<string, Account>();
             foreach (Account account in accountList)
             {
-                if (usernameLookup.ContainsKey(account.Username))
+                if (_usernameLookup.ContainsKey(account.Username))
                     throw new InvalidOperationException("Accounts cannot have the same username.");
-                usernameLookup.Add(account.Username, account);
+                _usernameLookup.Add(account.Username, account);
             }
         }
 
         public Account RegisterAccount(string username, string password)
         {
-            if (usernameLookup.ContainsKey(username))
+            if (_usernameLookup.ContainsKey(username))
                 throw new InvalidOperationException("Cannot create an account with a username already taken.");
             Account account = new Account(username, password, DateTime.Now, DateTime.Now);
-            this.accountList.Add(account);
-            this.usernameLookup.Add(username, account);
+            this._accountList.Add(account);
+            this._usernameLookup.Add(username, account);
             return account;
         }
 
         public void DeleteAccount(Account account)
         {
-            if (!usernameLookup.ContainsKey(account.Username))
+            if (!_usernameLookup.ContainsKey(account.Username))
                 throw new ArgumentException("Account is not part of database.", "account");
-            this.usernameLookup.Remove(account.Username);
-            this.accountList.Remove(account);
+            this._usernameLookup.Remove(account.Username);
+            this._accountList.Remove(account);
         }
 
         public void Save()
         {
-            if (saveFileSource == null)
+            if (_saveFileSource == null)
                 throw new InvalidOperationException("Cannot save a database with no assigned file source.");
-            FileStream fileStream = new FileStream(saveFileSource, FileMode.Open, FileAccess.Write);
+            FileStream fileStream = new FileStream(_saveFileSource, FileMode.Open, FileAccess.Write);
             BinaryWriter writer = new BinaryWriter(fileStream);
-            writer.Write(accountList.Count);
-            foreach (Account account in accountList)
+            writer.Write(_accountList.Count);
+            foreach (Account account in _accountList)
                 account.WriteToStream(fileStream);
             fileStream.Close();
         }

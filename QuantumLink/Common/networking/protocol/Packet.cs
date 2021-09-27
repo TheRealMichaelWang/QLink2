@@ -7,28 +7,28 @@ namespace QuantumLink.networking.protocol
     public abstract class Packet
     {
         public readonly byte Opcode;
-        protected readonly Stream stream;
+        protected readonly Stream Stream;
 
         public Packet(byte opcode, Stream stream)
         {
             this.Opcode = opcode;
-            this.stream = stream;
+            this.Stream = stream;
         }
     }
 
     public class OutboundPacket : Packet
     {
-        protected readonly BinaryWriter writer;
+        protected readonly BinaryWriter Writer;
 
         public OutboundPacket(byte opcode) : base(opcode, new MemoryStream())
         {
-            writer = new BinaryWriter(this.stream, Encoding.UTF8);
-            writer.Write(opcode);
+            Writer = new BinaryWriter(this.Stream, Encoding.UTF8);
+            Writer.Write(opcode);
         }
 
         public void Send(NetworkStream networkStream)
         {
-            MemoryStream memoryStream = (MemoryStream)this.stream;
+            MemoryStream memoryStream = (MemoryStream)this.Stream;
             memoryStream.WriteTo(networkStream);
             memoryStream.Close();
         }
@@ -36,16 +36,16 @@ namespace QuantumLink.networking.protocol
 
     public class InboundPacket : Packet
     {
-        protected readonly BinaryReader reader;
+        protected readonly BinaryReader Reader;
 
         public InboundPacket(NetworkStream networkStream) : base((byte)networkStream.ReadByte(), networkStream)
         {
-            reader = new BinaryReader(networkStream, Encoding.UTF8);
+            Reader = new BinaryReader(networkStream, Encoding.UTF8);
         }
 
-        public InboundPacket(InboundPacket thisPacket) : base(thisPacket.Opcode, thisPacket.stream)
+        public InboundPacket(InboundPacket thisPacket) : base(thisPacket.Opcode, thisPacket.Stream)
         {
-            reader = thisPacket.reader;
+            Reader = thisPacket.Reader;
         }
     }
 }

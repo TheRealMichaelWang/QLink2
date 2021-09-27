@@ -8,8 +8,8 @@ namespace Common.networking.protocol.requests
         {
             public AccountRequestEncoder(AccountRequest accountRequest) : base(1)
             {
-                this.writer.Write((byte)accountRequest.Operation);
-                this.writer.Write(accountRequest.Payload);
+                this.Writer.Write((byte)accountRequest.Operation);
+                this.Writer.Write(accountRequest.Payload);
             }
         }
 
@@ -19,7 +19,7 @@ namespace Common.networking.protocol.requests
 
             public AccountRequestDecoder(InboundPacket inboundPacket) : base(inboundPacket)
             {
-                DecodedAccountRequest = new AccountRequest((AccountOperation)this.reader.ReadByte(), this.reader.ReadString());
+                DecodedAccountRequest = new AccountRequest((AccountOperation)this.Reader.ReadByte(), this.Reader.ReadString());
             }
         }
 

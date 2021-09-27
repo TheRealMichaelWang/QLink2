@@ -8,9 +8,9 @@ namespace Common.networking.protocol.requests
         {
             public AuthRequestEncoder(AuthRequest request) : base(0)
             {
-                this.writer.Write(request.Username);
-                this.writer.Write(request.Password);
-                this.writer.Write(request.CreateAccount);
+                this.Writer.Write(request.Username);
+                this.Writer.Write(request.Password);
+                this.Writer.Write(request.CreateAccount);
             }
         }
 
@@ -20,7 +20,7 @@ namespace Common.networking.protocol.requests
 
             public AuthRequestDecoder(InboundPacket inboundPacket) : base(inboundPacket)
             {
-                this.DecodedAuthRequest = new AuthRequest(this.reader.ReadString(), this.reader.ReadString(), this.reader.ReadBoolean());
+                this.DecodedAuthRequest = new AuthRequest(this.Reader.ReadString(), this.Reader.ReadString(), this.Reader.ReadBoolean());
             }
         }
 
