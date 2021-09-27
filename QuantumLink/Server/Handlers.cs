@@ -13,44 +13,44 @@ namespace Server.networking
 {
     public sealed class HandledSession : Session
     {
-        private volatile Authenticator Authenticator;
+        private volatile Authenticator _authenticator;
 
         public HandledSession(TcpClient client, ClientDisconnectedEventHandler sessionDisposedHandler, Authenticator authenticator) : base(client, sessionDisposedHandler)
         {
-            handlers.Add(0, handleAuthRequest);
-            handlers.Add(1, handleAccountRequest);
-            this.Authenticator = authenticator;
+            handlers.Add(0, HandleAuthRequest);
+            handlers.Add(1, HandleAccountRequest);
+            this._authenticator = authenticator;
         }
 
-        private void handleAuthRequest(InboundPacket inboundPacket)
+        private void HandleAuthRequest(InboundPacket inboundPacket)
         {
             AuthRequest.AuthRequestDecoder authRequestDecoder = new AuthRequest.AuthRequestDecoder(inboundPacket);
-            StatusResponse response = Authenticator.Authenticate(authRequestDecoder.DecodedAuthRequest, this);
+            StatusResponse response = _authenticator.Authenticate(authRequestDecoder.DecodedAuthRequest, this);
             this.toSend.Enqueue(new StatusResponse.StatusResponseEncoder(response));
         }
 
-        private void handleAccountRequest(InboundPacket inboundPacket)
+        private void HandleAccountRequest(InboundPacket inboundPacket)
         {
             AccountRequest.AccountRequestDecoder accountRequestDecoder = new AccountRequest.AccountRequestDecoder(inboundPacket);
             AccountRequest.AccountOperation operation = accountRequestDecoder.DecodedAccountRequest.Operation;
             try
             {
-                Account sessionAccount = Authenticator.FindAccount(this);
+                Account sessionAccount = _authenticator.FindAccount(this);
                 string statusMsg;
-                if (operation == AccountRequest.AccountOperation.Logout)
+                switch (operation)
                 {
-                    Authenticator.Logout(sessionAccount);
-                    statusMsg = "Succesfully logged out";
-                }
-                else if (operation == AccountRequest.AccountOperation.ChangePassword)
-                {
-                    sessionAccount.Password = accountRequestDecoder.DecodedAccountRequest.Payload;
-                    statusMsg = "Succesfully changed password";
-                }
-                else
-                {
-                    Authenticator.DeleteAccount(sessionAccount);
-                    statusMsg = "Account succesfully deleted";
+                    case AccountRequest.AccountOperation.Logout:
+                        _authenticator.Logout(sessionAccount);
+                        statusMsg = "Succesfully logged out";
+                        break;
+                    case AccountRequest.AccountOperation.ChangePassword:
+                        sessionAccount.Password = accountRequestDecoder.DecodedAccountRequest.Payload;
+                        statusMsg = "Succesfully changed password";
+                        break;
+                    default:
+                        _authenticator.DeleteAccount(sessionAccount);
+                        statusMsg = "Account succesfully deleted";
+                        break;
                 }
                 this.toSend.Enqueue(new StatusResponse.StatusResponseEncoder(new StatusResponse(0, statusMsg)));
             }
