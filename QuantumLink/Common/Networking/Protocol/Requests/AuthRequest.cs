@@ -16,7 +16,7 @@ namespace Common.networking.protocol.requests
 
         public sealed class AuthRequestDecoder : InboundPacket
         {
-            public readonly AuthRequest DecodedAuthRequest;
+            public AuthRequest DecodedAuthRequest { get; }
 
             public AuthRequestDecoder(InboundPacket inboundPacket) : base(inboundPacket)
             {
@@ -24,10 +24,9 @@ namespace Common.networking.protocol.requests
             }
         }
 
-        public readonly string Username;
-        public readonly string Password;
-
-        public readonly bool CreateAccount;
+        public string Username      { get; }
+        public string Password      { get; }
+        public bool   CreateAccount { get; }
 
         public AuthRequest(string username, string password, bool createAccount)
         {

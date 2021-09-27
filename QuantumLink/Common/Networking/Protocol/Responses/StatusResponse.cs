@@ -15,7 +15,7 @@ namespace Common.networking.protocol.responses
 
         public sealed class StatusResponseDecoder : InboundPacket
         {
-            public readonly StatusResponse DecodedStatusResponse;
+            public StatusResponse DecodedStatusResponse { get; }
 
             public StatusResponseDecoder(InboundPacket inboundPacket) : base(inboundPacket)
             {
@@ -23,8 +23,8 @@ namespace Common.networking.protocol.responses
             }
         }
 
-        public readonly byte StatusCode;
-        public readonly string Message;
+        public byte   StatusCode { get; }
+        public string Message    { get; }
 
         public StatusResponse(byte statusCode, string message)
         {

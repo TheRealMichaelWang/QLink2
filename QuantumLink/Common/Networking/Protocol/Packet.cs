@@ -18,7 +18,7 @@ namespace QuantumLink.networking.protocol
 
     public class OutboundPacket : Packet
     {
-        protected readonly BinaryWriter Writer;
+        protected BinaryWriter Writer { get; }
 
         public OutboundPacket(byte opcode) : base(opcode, new MemoryStream())
         {
@@ -36,7 +36,7 @@ namespace QuantumLink.networking.protocol
 
     public class InboundPacket : Packet
     {
-        protected readonly BinaryReader Reader;
+        protected BinaryReader Reader { get; }
 
         public InboundPacket(NetworkStream networkStream) : base((byte)networkStream.ReadByte(), networkStream)
         {

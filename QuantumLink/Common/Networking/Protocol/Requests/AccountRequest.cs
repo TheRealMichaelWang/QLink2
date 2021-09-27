@@ -30,8 +30,8 @@ namespace Common.networking.protocol.requests
             DeleteAccount
         }
 
-        public readonly AccountOperation Operation;
-        public readonly string Payload;
+        public AccountOperation Operation { get; }
+        public string           Payload   { get; }
 
         public AccountRequest(AccountOperation operation, string payload)
         {
