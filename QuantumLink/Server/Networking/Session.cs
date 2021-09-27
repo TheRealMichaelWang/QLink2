@@ -1,11 +1,11 @@
-﻿using QuantumLink.networking.protocol;
+﻿using QuantumLink.Common.Networking.Protocol;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Server.networking
+namespace QuantumLink.Server.Networking
 {
     public delegate void ClientDisconnectedEventHandler(Session session);
 

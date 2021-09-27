@@ -1,4 +1,4 @@
-﻿using QuantumLink.networking.protocol;
+﻿using QuantumLink.Common.Networking.Protocol;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Client.networking
+namespace QuantumLink.Client.Networking
 {
     public sealed partial class Client : IDisposable
     {

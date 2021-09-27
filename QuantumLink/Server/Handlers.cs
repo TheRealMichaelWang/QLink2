@@ -1,15 +1,15 @@
-﻿using Common.networking.protocol.requests;
-using Common.networking.protocol.responses;
-using QuantumLink.networking.protocol;
-using Server.authentication;
+﻿using QuantumLink.Common.Networking.Protocol.Requests;
+using QuantumLink.Common.Networking.Protocol.Responses;
+using QuantumLink.Common.Networking.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using QuantumLink.Server.Authentication;
 
-namespace Server.networking
+namespace QuantumLink.Server.Networking
 {
     public sealed class HandledSession : Session
     {

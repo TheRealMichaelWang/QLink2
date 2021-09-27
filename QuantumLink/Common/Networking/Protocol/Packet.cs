@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 
-namespace QuantumLink.networking.protocol
+namespace QuantumLink.Common.Networking.Protocol
 {
     public abstract class Packet
     {

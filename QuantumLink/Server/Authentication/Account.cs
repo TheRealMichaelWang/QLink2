@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Server.authentication
+namespace QuantumLink.Server.Authentication
 {
     public sealed class Account
     {

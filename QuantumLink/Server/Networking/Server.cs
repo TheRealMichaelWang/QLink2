@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Server.networking
+namespace QuantumLink.Server.Networking
 {
     public delegate Session ClientConnectedEventHandler(TcpClient client);
 

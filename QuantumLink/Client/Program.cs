@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Client
+namespace QuantumLink.Client
 {
     class Program
     {

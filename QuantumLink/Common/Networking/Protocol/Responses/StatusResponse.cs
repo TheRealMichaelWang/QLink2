@@ -1,6 +1,4 @@
-﻿using QuantumLink.networking.protocol;
-
-namespace Common.networking.protocol.responses
+﻿namespace QuantumLink.Common.Networking.Protocol.Responses
 {
     public sealed class StatusResponse
     {

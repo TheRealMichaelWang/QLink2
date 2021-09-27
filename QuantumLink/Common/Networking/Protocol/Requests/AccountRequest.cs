@@ -1,6 +1,4 @@
-﻿using QuantumLink.networking.protocol;
-
-namespace Common.networking.protocol.requests
+﻿namespace QuantumLink.Common.Networking.Protocol.Requests
 {
     public sealed class AccountRequest
     {

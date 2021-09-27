@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server.authentication
+namespace QuantumLink.Server.Authentication
 {
     public sealed class AccountDatabase
     {

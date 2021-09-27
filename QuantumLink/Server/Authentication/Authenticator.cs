@@ -1,14 +1,14 @@
-﻿using Common.networking.protocol.requests;
-using Common.networking.protocol.responses;
-using Server.networking;
+﻿using QuantumLink.Common.Networking.Protocol.Requests;
+using QuantumLink.Common.Networking.Protocol.Responses;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QuantumLink.Server.Networking;
 
-namespace Server.authentication
+namespace QuantumLink.Server.Authentication
 {
     public sealed class Authenticator : IDisposable
     {
@@ -19,7 +19,7 @@ namespace Server.authentication
 
         private HashSet<Account> _authenticatedAccounts;
 
-        public Authenticator(AccountDatabase accountDatabase, Server.networking.Server server)
+        public Authenticator(AccountDatabase accountDatabase, Server.Networking.Server server)
         {
             this.AccountDatabase = accountDatabase;
             this._sessionLookups = new Dictionary<Account, HandledSession>();
