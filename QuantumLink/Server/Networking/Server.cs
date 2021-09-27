@@ -25,7 +25,7 @@ namespace Server.networking
         {
             sessions = new List<Session>();
             tcpListener = new TcpListener(IPAddress.Any, port);
-            connectionThread = new Thread(new ThreadStart(connectionLoop));
+            connectionThread = new Thread(ConnectionLoop);
             this.Running = false;
         }
 
@@ -47,25 +47,20 @@ namespace Server.networking
             this.Running = false;
         }
 
-        private void handleSessionDisposed(Session session)
+        private void HandleSessionDisposed(Session session)
         {
             sessions.Remove(session);
-            if (ClientDisconencted != null)
-                ClientDisconencted(session);
+            ClientDisconencted?.Invoke(session);
         }
 
-        private void connectionLoop()
+        private void ConnectionLoop()
         {
             while (!stopping)
             {
                 if (tcpListener.Pending())
                 {
                     TcpClient client = tcpListener.AcceptTcpClient();
-                    Session toadd;
-                    if (ClientConnected != null)
-                        toadd = ClientConnected(client);
-                    else
-                        toadd = new Session(client, handleSessionDisposed);
+                    Session toadd = ClientConnected != null ? ClientConnected(client) : new Session(client, HandleSessionDisposed);
                     sessions.Add(toadd);
                 }
             }
