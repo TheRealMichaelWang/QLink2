@@ -1,6 +1,4 @@
-﻿using QuantumLink.networking.protocol;
-
-namespace Common.networking.protocol.responses
+﻿namespace QuantumLink.Common.Networking.Protocol.Responses
 {
     public sealed class StatusResponse
     {
@@ -8,23 +6,23 @@ namespace Common.networking.protocol.responses
         {
             public StatusResponseEncoder(StatusResponse statusResponse) : base(0)
             {
-                this.writer.Write(statusResponse.StatusCode);
-                this.writer.Write(statusResponse.Message);
+                this.Writer.Write(statusResponse.StatusCode);
+                this.Writer.Write(statusResponse.Message);
             }
         }
 
         public sealed class StatusResponseDecoder : InboundPacket
         {
-            public readonly StatusResponse DecodedStatusResponse;
+            public StatusResponse DecodedStatusResponse { get; }
 
             public StatusResponseDecoder(InboundPacket inboundPacket) : base(inboundPacket)
             {
-                DecodedStatusResponse = new StatusResponse(this.reader.ReadByte(), this.reader.ReadString());
+                DecodedStatusResponse = new StatusResponse(this.Reader.ReadByte(), this.Reader.ReadString());
             }
         }
 
-        public readonly byte StatusCode;
-        public readonly string Message;
+        public byte   StatusCode { get; }
+        public string Message    { get; }
 
         public StatusResponse(byte statusCode, string message)
         {

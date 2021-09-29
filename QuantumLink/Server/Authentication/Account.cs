@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Server.authentication
+namespace QuantumLink.Server.Authentication
 {
     public sealed class Account
     {
@@ -11,17 +11,17 @@ namespace Server.authentication
             return new Account(reader.ReadString(), reader.ReadString(), new DateTime(reader.ReadInt64()), new DateTime(reader.ReadInt64()));
         }
 
-        public readonly string Username;
-        public string Password;
+        public string Username { get; }
+        public string Password { get; set; }
 
-        public DateTime LastLogon;
-        public readonly DateTime CakeDay;
+        public DateTime LastLogon { get; set; }
+        public DateTime CakeDay { get; }
 
-        public Account(string username, string passsword, DateTime lastLoggon, DateTime cakeDay)
+        public Account(string username, string password, DateTime lastLogon, DateTime cakeDay)
         {
             this.Username = username;
-            this.Password = passsword;
-            this.LastLogon = lastLoggon;
+            this.Password = password;
+            this.LastLogon = lastLogon;
             this.CakeDay = cakeDay;
         }
 

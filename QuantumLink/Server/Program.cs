@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Server
+namespace QuantumLink.Server
 {
     class Program
     {

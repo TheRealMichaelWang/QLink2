@@ -1,6 +1,4 @@
-﻿using QuantumLink.networking.protocol;
-
-namespace Common.networking.protocol.requests
+﻿namespace QuantumLink.Common.Networking.Protocol.Requests
 {
     public sealed class AccountRequest
     {
@@ -8,8 +6,8 @@ namespace Common.networking.protocol.requests
         {
             public AccountRequestEncoder(AccountRequest accountRequest) : base(1)
             {
-                this.writer.Write((byte)accountRequest.Operation);
-                this.writer.Write(accountRequest.Payload);
+                this.Writer.Write((byte)accountRequest.Operation);
+                this.Writer.Write(accountRequest.Payload);
             }
         }
 
@@ -19,7 +17,7 @@ namespace Common.networking.protocol.requests
 
             public AccountRequestDecoder(InboundPacket inboundPacket) : base(inboundPacket)
             {
-                DecodedAccountRequest = new AccountRequest((AccountOperation)this.reader.ReadByte(), this.reader.ReadString());
+                DecodedAccountRequest = new AccountRequest((AccountOperation)this.Reader.ReadByte(), this.Reader.ReadString());
             }
         }
 
@@ -30,8 +28,8 @@ namespace Common.networking.protocol.requests
             DeleteAccount
         }
 
-        public readonly AccountOperation Operation;
-        public readonly string Payload;
+        public AccountOperation Operation { get; }
+        public string Payload { get; }
 
         public AccountRequest(AccountOperation operation, string payload)
         {

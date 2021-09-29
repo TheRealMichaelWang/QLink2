@@ -1,11 +1,11 @@
-﻿using QuantumLink.networking.protocol;
+﻿using QuantumLink.Common.Networking.Protocol;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Server.networking
+namespace QuantumLink.Server.Networking
 {
     public delegate void ClientDisconnectedEventHandler(Session session);
 
@@ -13,53 +13,53 @@ namespace Server.networking
     {
         protected delegate void OpcodeHandler(InboundPacket inboundPacket);
 
-        protected readonly TcpClient client;
-        protected readonly NetworkStream networkStream;
+        protected readonly TcpClient Client;
+        protected readonly NetworkStream NetworkStream;
 
-        protected readonly Thread listenThread;
-        private volatile bool stopping;
+        protected readonly Thread ListenThread;
+        private volatile bool _stopping;
         
         public bool Disposed { get; private set; }
 
-        protected readonly Dictionary<byte, OpcodeHandler> handlers;
-        protected readonly Queue<OutboundPacket> toSend;
+        protected readonly Dictionary<byte, OpcodeHandler> Handlers;
+        protected readonly Queue<OutboundPacket> ToSend;
 
         public ClientDisconnectedEventHandler ClientDisconnected;
 
         public Session(TcpClient client, ClientDisconnectedEventHandler clientDisconnectedHandler)
         {
-            this.client = client;
+            this.Client = client;
             this.ClientDisconnected = clientDisconnectedHandler;
-            this.networkStream = client.GetStream();
-            this.handlers = new Dictionary<byte, OpcodeHandler>();
-            this.toSend = new Queue<OutboundPacket>();
-            this.listenThread = new Thread(new ThreadStart(listenLoop));
-            this.listenThread.Start();
-            this.stopping = false;
+            this.NetworkStream = client.GetStream();
+            this.Handlers = new Dictionary<byte, OpcodeHandler>();
+            this.ToSend = new Queue<OutboundPacket>();
+            this.ListenThread = new Thread(ListenLoop);
+            this.ListenThread.Start();
+            this._stopping = false;
             this.Disposed = false;
         }
 
-        private void listenLoop()
+        private void ListenLoop()
         {
-            while (!this.stopping)
+            while (!this._stopping)
             {
-                if (networkStream.DataAvailable)
+                if (NetworkStream.DataAvailable)
                 {
                     try
                     {
-                        InboundPacket inboundPacket = new InboundPacket(networkStream);
-                        handlers[inboundPacket.Opcode](inboundPacket);
+                        InboundPacket inboundPacket = new InboundPacket(NetworkStream);
+                        Handlers[inboundPacket.Opcode](inboundPacket);
                     }
                     catch (IOException)
                     {
                         Dispose();
                     }
                 }
-                while(!this.stopping && toSend.Count > 0)
+                while(!this._stopping && ToSend.Count > 0)
                 {
                     try
                     {
-                        toSend.Dequeue().Send(networkStream);
+                        ToSend.Dequeue().Send(NetworkStream);
                     }
                     catch (IOException)
                     {
@@ -78,9 +78,9 @@ namespace Server.networking
 
             if (disposing)
             {
-                this.stopping = true;
-                this.networkStream.Close();
-                this.client.Close();
+                this._stopping = true;
+                this.NetworkStream.Close();
+                this.Client.Close();
                 this.ClientDisconnected(this);
             }
             this.Disposed = true;
