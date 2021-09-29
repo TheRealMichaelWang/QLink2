@@ -29,7 +29,7 @@
         }
 
         public AccountOperation Operation { get; }
-        public string           Payload   { get; }
+        public string Payload { get; }
 
         public AccountRequest(AccountOperation operation, string payload)
         {

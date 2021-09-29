@@ -22,9 +22,9 @@
             }
         }
 
-        public string Username      { get; }
-        public string Password      { get; }
-        public bool   CreateAccount { get; }
+        public string Username { get; }
+        public string Password { get; }
+        public bool CreateAccount { get; }
 
         public AuthRequest(string username, string password, bool createAccount)
         {

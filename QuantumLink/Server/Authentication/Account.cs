@@ -15,7 +15,7 @@ namespace QuantumLink.Server.Authentication
         public string Password { get; set; }
 
         public DateTime LastLogon { get; set; }
-        public DateTime CakeDay   { get; }
+        public DateTime CakeDay { get; }
 
         public Account(string username, string password, DateTime lastLogon, DateTime cakeDay)
         {

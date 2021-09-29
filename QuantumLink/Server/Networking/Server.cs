@@ -18,7 +18,7 @@ namespace QuantumLink.Server.Networking
 
         public bool Running { get; private set; }
 
-        public ClientConnectedEventHandler    ClientConnected     { get; set; }
+        public ClientConnectedEventHandler ClientConnected { get; set; }
         public ClientDisconnectedEventHandler ClientDisconnencted { get; set; }
 
         public Server(int port)
